@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -66,8 +67,7 @@ func New() *Writer {
 	return &Writer{
 		Out:             Out,
 		RefreshInterval: RefreshInterval,
-
-		mtx: &sync.Mutex{},
+		mtx:             &sync.Mutex{},
 	}
 }
 
@@ -122,8 +122,12 @@ func (w *Writer) Stop() {
 	<-w.tdone
 }
 
-func (w *Writer) Printf(s string, args ...interface{}) {
+func (w *Writer) Printf(s string, args ...interface{}) *Writer {
+	if !strings.HasSuffix(s, "\n") {
+		s += "\n"
+	}
 	fmt.Fprintf(w, s, args...)
+	return w
 }
 
 // Listen listens for updates to the writer's buffer and flushes to the out provided. It blocks the runtime.

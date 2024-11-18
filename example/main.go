@@ -1,27 +1,27 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/tsny-houzz/uilive"
 )
 
 func main() {
-	writer := uilive.New()
-
-	// start listening for updates and render
-	writer.Start()
+	writer := uilive.New().Start()
 
 	for _, f := range [][]string{{"Foo.zip", "Bar.iso"}, {"Baz.tar.gz", "Qux.img"}} {
 		for i := 0; i <= 50; i++ {
-			_, _ = fmt.Fprintf(writer, "Downloading %s.. (%d/%d) GB\n", f[0], i, 50)
-			_, _ = fmt.Fprintf(writer.Newline(), "Downloading %s.. (%d/%d) GB\n", f[1], i, 50)
-			time.Sleep(time.Millisecond * 25)
+			writer.Printf("Downloading %s.. (%d/%d) GB\n", f[0], i, 50)
+			writer.Printf("Downloading %s.. (%d/%d) GB\n", f[1], i, 50)
+			time.Sleep(time.Millisecond * 15)
 		}
-		_, _ = fmt.Fprintf(writer.Bypass(), "Downloaded %s\n", f[0])
-		_, _ = fmt.Fprintf(writer.Bypass(), "Downloaded %s\n", f[1])
 	}
-	_, _ = fmt.Fprintln(writer, "Finished: Downloaded 150GB")
+	writer.Printf("Finished: Downloaded 150GB")
+
+	writer = uilive.New().Start()
+	writer.Printf("Waiting...")
+	time.Sleep(2 * time.Second)
+	writer.Printf("Done!")
+
 	writer.Stop() // flush and stop rendering
 }
