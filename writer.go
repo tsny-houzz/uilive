@@ -3,6 +3,7 @@ package uilive
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -104,13 +105,14 @@ func (w *Writer) Flush() error {
 }
 
 // Start starts the listener in a non-blocking manner
-func (w *Writer) Start() {
+func (w *Writer) Start() *Writer {
 	if w.ticker == nil {
 		w.ticker = time.NewTicker(w.RefreshInterval)
 		w.tdone = make(chan bool)
 	}
 
 	go w.Listen()
+	return w
 }
 
 // Stop stops the listener that updates the terminal
@@ -118,6 +120,10 @@ func (w *Writer) Stop() {
 	w.Flush()
 	w.tdone <- true
 	<-w.tdone
+}
+
+func (w *Writer) Printf(s string, args ...interface{}) {
+	fmt.Fprintf(w, s, args...)
 }
 
 // Listen listens for updates to the writer's buffer and flushes to the out provided. It blocks the runtime.
